@@ -26,4 +26,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile 'com.github.gabrielemariotti.cards:cardslib-core:2.1.0'
     compile 'com.github.gabrielemariotti.cards:cardslib-cards:2.1.0'
+    compile 'com.google.android.gms:play-services:7.8.0'
 }

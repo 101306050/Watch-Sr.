@@ -14,7 +14,6 @@ import com.baobomb.watch.parse.ParseUtil;
 import com.baobomb.watch.util.dialog.CheckDialog;
 import com.baobomb.watch.util.dialog.EditDialog;
 import com.baobomb.watch.util.dialog.Progress;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +49,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
     @Override
     protected void onStart() {
         super.onStart();
-        if (ParseUser.getCurrentUser() != null) {
-            initTrackList();
-        }
+        initTrackList();
     }
 
     public void initTrackList() {
@@ -105,6 +102,5 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
     @Override
     protected void onStop() {
         super.onStop();
-        finish();
     }
 }

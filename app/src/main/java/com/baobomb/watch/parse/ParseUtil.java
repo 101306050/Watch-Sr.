@@ -2,6 +2,7 @@ package com.baobomb.watch.parse;
 
 import android.util.Log;
 
+import com.baobomb.watch.parse.model.WatchLocation;
 import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -98,6 +99,21 @@ public class ParseUtil {
         });
     }
 
+    public static void getWatchLocation(String watchid, final OnGetLocationListener onGetLocationListener) {
+        ParseQuery<WatchLocation> query = ParseQuery.getQuery(WatchLocation.class);
+        query.whereEqualTo("watchid", watchid);
+        query.findInBackground(new FindCallback<WatchLocation>() {
+            @Override
+            public void done(List<WatchLocation> watchLocations, ParseException e) {
+                if (e == null && watchLocations.size() > 0) {
+                    onGetLocationListener.onSuccess(watchLocations);
+                } else {
+                    onGetLocationListener.onNone();
+                }
+            }
+        });
+    }
+
     public static void signUp(String name, String password, String email, final OnSignUpListener onSignUpListener) {
         JSONArray jsonArray = new JSONArray();
         ParseUser user = new ParseUser();
@@ -145,6 +161,12 @@ public class ParseUtil {
 
     public static abstract class OnCheckListener {
         public abstract void onExit();
+
+        public abstract void onNone();
+    }
+
+    public static abstract class OnGetLocationListener {
+        public abstract void onSuccess(List<WatchLocation> watchLocations);
 
         public abstract void onNone();
     }
