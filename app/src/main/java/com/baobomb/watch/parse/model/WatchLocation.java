@@ -24,6 +24,14 @@ public class WatchLocation extends ParseObject {
         put("longitude", longitude);
     }
 
+    public String getAltitude() {
+        return getString("altitude");
+    }
+
+    public void setAltitude(String altitude) {
+        put("altitude", altitude);
+    }
+
     public String getWatchID() {
         return getString("watchid");
     }

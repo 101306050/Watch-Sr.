@@ -34,7 +34,7 @@ public class TrackItemCard extends Card {
         super.setupInnerViewElements(parent, view);
         id = (TextView) parent.findViewById(R.id.id);
         if (trackId != null) {
-            id.setText("追蹤裝置ID : "+ trackId);
+            id.setText("裝置ID : "+ trackId);
         }
     }
 }

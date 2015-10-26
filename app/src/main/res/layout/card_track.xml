@@ -9,6 +9,5 @@
         android:id="@+id/id"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:gravity="center"
-        android:text="ID : "/>
+        android:gravity="center"/>
 </LinearLayout>

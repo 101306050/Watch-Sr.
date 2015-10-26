@@ -114,6 +114,21 @@ public class ParseUtil {
         });
     }
 
+    public static void getUser(String watchid, final OnGetUserListener onGetUserListener) {
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("objectId", watchid);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> parseUsers, ParseException e) {
+                if (e == null && parseUsers != null && parseUsers.size() > 0) {
+                    onGetUserListener.onSuccess(parseUsers.get(0));
+                } else {
+                    onGetUserListener.onNone();
+                }
+            }
+        });
+    }
+
     public static void signUp(String name, String password, String email, final OnSignUpListener onSignUpListener) {
         JSONArray jsonArray = new JSONArray();
         ParseUser user = new ParseUser();
@@ -167,6 +182,12 @@ public class ParseUtil {
 
     public static abstract class OnGetLocationListener {
         public abstract void onSuccess(List<WatchLocation> watchLocations);
+
+        public abstract void onNone();
+    }
+
+    public static abstract class OnGetUserListener {
+        public abstract void onSuccess(ParseUser parseUser);
 
         public abstract void onNone();
     }

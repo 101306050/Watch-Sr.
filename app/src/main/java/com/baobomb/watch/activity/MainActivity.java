@@ -42,8 +42,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
         progress = new Progress();
         progress.bind(this);
         trackAdapter = new TrackAdapter(this);
+        trackList.setEmptyView(findViewById(R.id.emptyView));
         trackList.setAdapter(trackAdapter);
         trackList.setOnItemClickListener(this);
+
     }
 
     @Override

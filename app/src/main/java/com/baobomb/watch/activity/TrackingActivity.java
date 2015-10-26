@@ -3,6 +3,7 @@ package com.baobomb.watch.activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.baobomb.watch.R;
@@ -17,7 +18,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +29,7 @@ import java.util.List;
 public class TrackingActivity extends FragmentActivity {
 
     String id;
-    TextView watchID;
+    TextView watchID, watchName, latitude, longitude, altitude;
     private GoogleMap mMap;
 
     @Override
@@ -34,6 +37,10 @@ public class TrackingActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracking);
         watchID = (TextView) findViewById(R.id.watchID);
+        watchName = (TextView) findViewById(R.id.watchName);
+        latitude = (TextView) findViewById(R.id.latitude);
+        longitude = (TextView) findViewById(R.id.longitude);
+        altitude = (TextView) findViewById(R.id.altitude);
         setUpMapIfNeeded();
     }
 
@@ -47,16 +54,48 @@ public class TrackingActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         id = getIntent().getStringExtra("TrackId");
-        watchID.setText(id);
+        watchID.setText("ID : " + id);
+        setUpWatchDetail(id);
         ParseUtil.getWatchLocation(id, new ParseUtil.OnGetLocationListener() {
             @Override
             public void onSuccess(List<WatchLocation> watchLocations) {
-                setUpMap(watchLocations.get(0));
-                try {
-                    addMarker(watchLocations);
-                } catch (Exception e) {
-
+                ArrayList<WatchLocation> newLocations = new ArrayList<>();
+                if (watchLocations.size() > 5) {
+                    for (int i = watchLocations.size() - 5; i < watchLocations.size(); i++) {
+                        newLocations.add(watchLocations.get(i));
+                    }
+                } else {
+                    for (int i = 0; i < watchLocations.size(); i++) {
+                        newLocations.add(watchLocations.get(i));
+                    }
                 }
+
+                for (int i = 0; i < newLocations.size(); i++) {
+                    Log.d("Bao", newLocations.get(i).getCreatedAt().toString());
+                }
+
+                if (newLocations.size() > 0) {
+                    setUpMap(newLocations.get(newLocations.size() - 1));
+                    try {
+                        addMarker(newLocations);
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+
+            @Override
+            public void onNone() {
+
+            }
+        });
+    }
+
+    private void setUpWatchDetail(String userID) {
+        ParseUtil.getUser(userID, new ParseUtil.OnGetUserListener() {
+            @Override
+            public void onSuccess(ParseUser parseUser) {
+                watchName.setText("Name : " + parseUser.getUsername());
             }
 
             @Override
@@ -80,6 +119,9 @@ public class TrackingActivity extends FragmentActivity {
         LatLng place = new LatLng(Double.parseDouble(location.getLatitude()), Double.parseDouble(
                 location.getLongitude()));
         // 移動地圖
+        latitude.setText("緯度 : " + location.getLatitude());
+        longitude.setText("經度 : " + location.getLongitude());
+        altitude.setText("海拔 : " + location.getAltitude());
         try {
             moveMap(place);
         } catch (Exception e) {
@@ -87,7 +129,7 @@ public class TrackingActivity extends FragmentActivity {
 
     }
 
-    private void addMarker(List<WatchLocation> locations) {
+    private void addMarker(ArrayList<WatchLocation> locations) {
         for (int i = 0; i < locations.size(); i++) {
             LatLng place = new LatLng(Double.parseDouble(locations.get(i).getLatitude()),
                     Double.parseDouble(locations.get(i).getLongitude()));
