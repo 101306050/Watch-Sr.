@@ -14,5 +14,6 @@ https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend
     string in this file.
     --></string>
 
+    <!--請修改此參數為自己的API key-->
     <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyBjXb3D08y0hW-lmU96GJBLRV8LNZGCzHA</string>
 </resources>

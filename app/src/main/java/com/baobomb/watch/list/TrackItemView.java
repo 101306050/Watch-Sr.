@@ -5,6 +5,7 @@ import android.support.v7.widget.CardView;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.baobomb.watch.R;
 import com.baobomb.watch.card.TrackItemCard;
 
 import it.gmariotti.cardslib.library.view.CardViewNative;
@@ -21,6 +22,7 @@ public class TrackItemView extends RelativeLayout {
     public TrackItemView(Context context) {
         super(context);
         cardViewNative = new CardViewNative(context);
+        this.setBackgroundResource(R.drawable.title_background);
         cardViewNative.setLayoutParams(layoutParams);
         this.addView(cardViewNative);
     }

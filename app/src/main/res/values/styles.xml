@@ -5,4 +5,16 @@
         <!-- Customize your theme here. -->
     </style>
 
+
+    <style name="CustomActionBarTheme"
+           parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <style name="MyActionBar"
+           parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/icon_background</item>
+        <item name="background">@color/icon_background</item>
+    </style>
 </resources>

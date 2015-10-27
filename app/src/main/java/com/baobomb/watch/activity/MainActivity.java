@@ -1,8 +1,11 @@
 package com.baobomb.watch.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements
+        AdapterView.OnItemClickListener {
 
     Button track;
     EditDialog editDialog;
@@ -33,8 +37,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         trackList = (ListView) findViewById(R.id.trackList);
-        track = (Button) findViewById(R.id.track);
-        track.setOnClickListener(this);
         editDialog = new EditDialog();
         editDialog.bind(this);
         checkDialog = new CheckDialog();
@@ -49,26 +51,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        initTrackList();
-    }
-
-    public void initTrackList() {
-        progress.showProgress("確認裝置", "驗證中....");
-        ParseUtil.saveInstallation();
-        List<String> trackIds = new ArrayList<>();
-        trackIds = ParseUtil.getTrackId();
-        if (trackIds != null && trackIds.size() > 0) {
-            trackAdapter.setItems(trackIds);
-        }
-        progress.dismiss();
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.track:
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_show:
                 editDialog.showDialog("請輸入裝置ID", new EditDialog.OnDialogClickListener() {
                     @Override
                     public void onDialogClick(String condition) {
@@ -91,6 +83,24 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
                 });
                 break;
         }
+        return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initTrackList();
+    }
+
+    public void initTrackList() {
+        progress.showProgress("確認裝置", "驗證中....");
+        ParseUtil.saveInstallation();
+        List<String> trackIds = new ArrayList<>();
+        trackIds = ParseUtil.getTrackId();
+        if (trackIds != null && trackIds.size() > 0) {
+            trackAdapter.setItems(trackIds);
+        }
+        progress.dismiss();
     }
 
     @Override

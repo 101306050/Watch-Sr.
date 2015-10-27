@@ -3,7 +3,18 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="horizontal"
+              android:background="@drawable/item_background"
     >
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_watch_black_48dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center_vertical"
+        android:background="@color/icon_background"/>
 
     <TextView
         android:id="@+id/id"

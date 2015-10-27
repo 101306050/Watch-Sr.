@@ -1,9 +1,13 @@
 package com.baobomb.watch.list;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.baobomb.watch.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +51,20 @@ public class TrackAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        TrackItemView trackItemView;
+        ViewHolder holder;
         if (view == null) {
-            trackItemView = new TrackItemView(context);
+            holder = new ViewHolder();
+            view = LayoutInflater.from(context).inflate(R.layout.card_track, null);
+            holder.id = (TextView) view.findViewById(R.id.id);
+            view.setTag(holder);
         } else {
-            trackItemView = (TrackItemView) view;
+            holder = (ViewHolder) view.getTag();
         }
-        trackItemView.bind(items.get(i));
-        return trackItemView;
+        holder.id.setText("裝置ID : "+items.get(i));
+        return view;
+    }
+
+    class ViewHolder {
+        TextView id;
     }
 }
