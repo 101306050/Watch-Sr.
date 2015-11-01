@@ -1,5 +1,6 @@
 package com.baobomb.watch.activity;
 
+import android.app.NotificationManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -53,6 +54,9 @@ public class TrackingActivity extends FragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        String notiID = getIntent().getStringExtra("Noti");
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotificationManager.cancelAll();
         id = getIntent().getStringExtra("TrackId");
         watchID.setText("ID : " + id);
         setUpWatchDetail(id);

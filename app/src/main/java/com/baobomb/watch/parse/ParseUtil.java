@@ -154,6 +154,28 @@ public class ParseUtil {
         return trackIds;
     }
 
+    public static void checkWatchUpdate(final OnCheckTimeListener onCheckTimeListener) {
+        final List<String> users = getTrackId();
+        if (users != null) {
+            for (int i = 0; i < users.size(); i++) {
+                final int p = i;
+                getWatchLocation(users.get(i), new OnGetLocationListener() {
+                    @Override
+                    public void onSuccess(List<WatchLocation> watchLocations) {
+                        long createTime = watchLocations.get(watchLocations.size() - 1).getCreatedAt
+                                ().getTime();
+                        onCheckTimeListener.onSuccess(createTime, users.get(p));
+                    }
+
+                    @Override
+                    public void onNone() {
+
+                    }
+                });
+            }
+        }
+    }
+
     public static abstract class OnLoginListener {
         public abstract void onFinish();
 
@@ -188,6 +210,12 @@ public class ParseUtil {
 
     public static abstract class OnGetUserListener {
         public abstract void onSuccess(ParseUser parseUser);
+
+        public abstract void onNone();
+    }
+
+    public static abstract class OnCheckTimeListener {
+        public abstract void onSuccess(long time, String id);
 
         public abstract void onNone();
     }

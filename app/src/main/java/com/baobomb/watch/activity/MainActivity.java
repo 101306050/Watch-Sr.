@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.baobomb.watch.R;
+import com.baobomb.watch.alarm.Alarm;
 import com.baobomb.watch.list.TrackAdapter;
 import com.baobomb.watch.parse.ParseUtil;
 import com.baobomb.watch.util.dialog.CheckDialog;
@@ -90,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         initTrackList();
+        Alarm alarm = new Alarm(this, "com.baobomb.ALARM");
+        alarm.start();
     }
 
     public void initTrackList() {

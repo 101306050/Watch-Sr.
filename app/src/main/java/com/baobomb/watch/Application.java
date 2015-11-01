@@ -16,5 +16,6 @@ public class Application extends android.app.Application {
         ParseObject.registerSubclass(WatchLocation.class);
         Parse.initialize(this, "zgukLmrcLTc23zoUmnz9Brx4xtwzB2zwZdYk5lpB", "ctt8RVwUoOXeLJvu7JFuo0Cfu3GEeEdqeRZkp3cc");
         ParseInstallation.getCurrentInstallation().saveInBackground();
+//        PushService.setDefaultPushCallback(this, MainActivity.class);
     }
 }
