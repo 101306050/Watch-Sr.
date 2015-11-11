@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.baobomb.watch.R;
+import com.baobomb.watch.SharedPreferencesHandler;
 import com.baobomb.watch.alarm.Alarm;
 import com.baobomb.watch.list.TrackAdapter;
 import com.baobomb.watch.parse.ParseUtil;
@@ -24,7 +25,7 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements
-        AdapterView.OnItemClickListener {
+        AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     Button track;
     EditDialog editDialog;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements
     Progress progress;
     ListView trackList;
     TrackAdapter trackAdapter;
+    SharedPreferencesHandler sharedPreferencesHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,8 @@ public class MainActivity extends AppCompatActivity implements
         trackList.setEmptyView(findViewById(R.id.emptyView));
         trackList.setAdapter(trackAdapter);
         trackList.setOnItemClickListener(this);
-
+        trackList.setOnItemLongClickListener(this);
+        sharedPreferencesHandler = new SharedPreferencesHandler(getApplicationContext());
     }
 
     @Override
@@ -112,6 +115,19 @@ public class MainActivity extends AppCompatActivity implements
         intent.setClass(this, TrackingActivity.class);
         intent.putExtra("TrackId", trackAdapter.getItem(i));
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+        final int position = i;
+        editDialog.showDialog("設定裝置持有人名稱", new EditDialog.OnDialogClickListener() {
+            @Override
+            public void onDialogClick(String condition) {
+                sharedPreferencesHandler.keepWatchUserName(trackAdapter.getItem(position), condition);
+                trackAdapter.notifyDataSetChanged();
+            }
+        });
+        return true;
     }
 
     @Override

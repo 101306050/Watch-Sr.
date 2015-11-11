@@ -8,6 +8,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.baobomb.watch.R;
 import com.baobomb.watch.activity.MainActivity;
+import com.baobomb.watch.parse.ParseUtil;
 import com.parse.ParsePushBroadcastReceiver;
 
 import org.json.JSONException;
@@ -17,22 +18,49 @@ import org.json.JSONObject;
  * Created by baobomb on 2015/10/31.
  */
 public class CustomReceiver extends ParsePushBroadcastReceiver {
+
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         String notificationTitle = null;
         String notificationWatchID = null;
         String notificationMessage = null;
+        String notificationLat = null;
+        String notificationLng = null;
         try {
             JSONObject json = new JSONObject(intent.getExtras().getString("com.parse.Data"));
-            String alert = json.getString("alert");
-            JSONObject jsonObject = new JSONObject(alert);
-            notificationTitle = jsonObject.getString("title");
-            notificationWatchID = jsonObject.getString("watchid");
-            notificationMessage = jsonObject.getString("message");
+            notificationTitle = json.getString("title");
+            if (notificationTitle != null && notificationTitle.equals("通知")) {
+                notificationWatchID = json.getString("watchid");
+                notificationLat = json.getString("lat");
+                notificationLng = json.getString("lng");
+            } else {
+                notificationWatchID = json.getString("watchid");
+                notificationMessage = json.getString("message");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        generateNotification(context, notificationTitle, notificationWatchID, notificationMessage);
+        if (notificationTitle != null && notificationTitle.equals("通知")) {
+            final String id = notificationWatchID;
+            ParseUtil.checkPosition(notificationWatchID, notificationLat, notificationLng, new ParseUtil.OnRestrictCheckListener() {
+                @Override
+                public void onOut(double distance) {
+                    generateNotification(context, "警告", id, "超出限制活動範圍" + distance + "公尺");
+                }
+
+                @Override
+                public void onIn() {
+
+                }
+
+                @Override
+                public void onUnknow() {
+
+                }
+            });
+        } else {
+            generateNotification(context, notificationTitle, notificationWatchID, notificationMessage);
+        }
     }
 
     private void generateNotification(Context context, String alert, String watchid,

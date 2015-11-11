@@ -1,5 +1,6 @@
 package com.baobomb.watch;
 
+import com.baobomb.watch.parse.model.UserRestrict;
 import com.baobomb.watch.parse.model.WatchLocation;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
@@ -14,6 +15,7 @@ public class Application extends android.app.Application {
         super.onCreate();
         Parse.enableLocalDatastore(this);
         ParseObject.registerSubclass(WatchLocation.class);
+        ParseObject.registerSubclass(UserRestrict.class);
         Parse.initialize(this, "zgukLmrcLTc23zoUmnz9Brx4xtwzB2zwZdYk5lpB", "ctt8RVwUoOXeLJvu7JFuo0Cfu3GEeEdqeRZkp3cc");
         ParseInstallation.getCurrentInstallation().saveInBackground();
 //        PushService.setDefaultPushCallback(this, MainActivity.class);

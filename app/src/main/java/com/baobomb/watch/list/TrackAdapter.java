@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.baobomb.watch.R;
+import com.baobomb.watch.SharedPreferencesHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +19,12 @@ import java.util.List;
 public class TrackAdapter extends BaseAdapter {
 
     List<String> items = new ArrayList<>();
-
+    SharedPreferencesHandler sharedPreferencesHandler;
     Context context;
 
     public TrackAdapter(Context context) {
         this.context = context;
+        sharedPreferencesHandler = new SharedPreferencesHandler(context);
     }
 
     public void setItems(List<String> items) {
@@ -60,7 +62,7 @@ public class TrackAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) view.getTag();
         }
-        holder.id.setText("裝置ID : "+items.get(i));
+        holder.id.setText("裝置持有人 : " + sharedPreferencesHandler.getWatchName(items.get(i)));
         return view;
     }
 

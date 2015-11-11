@@ -5,11 +5,17 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.baobomb.watch.R;
 import com.baobomb.watch.parse.ParseUtil;
+import com.baobomb.watch.parse.model.UserRestrict;
 import com.baobomb.watch.parse.model.WatchLocation;
+import com.baobomb.watch.util.dialog.CheckDialog;
+import com.baobomb.watch.util.dialog.EditDialog;
+import com.baobomb.watch.util.dialog.Progress;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -30,19 +36,50 @@ import java.util.List;
 public class TrackingActivity extends FragmentActivity {
 
     String id;
-    TextView watchID, watchName, latitude, longitude, altitude;
+    TextView watchID, watchName, latitude, longitude, altitude, restrict, restrictLngText,
+            restrictLatText, restrictMetersText;
+    RelativeLayout titleLayout, restrictLayout;
+    ArrayList<WatchLocation> newLocations = new ArrayList<>();
     private GoogleMap mMap;
+    boolean isRestrictMode = false;
+    EditDialog editDialog;
+    CheckDialog checkDialog;
+    Progress progress;
+    ParseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracking);
+        restrictLayout = (RelativeLayout) findViewById(R.id.restrictLayout);
+        titleLayout = (RelativeLayout) findViewById(R.id.titleLayout);
         watchID = (TextView) findViewById(R.id.watchID);
         watchName = (TextView) findViewById(R.id.watchName);
         latitude = (TextView) findViewById(R.id.latitude);
         longitude = (TextView) findViewById(R.id.longitude);
         altitude = (TextView) findViewById(R.id.altitude);
+        restrictLngText = (TextView) findViewById(R.id.restrictLng);
+        restrictLatText = (TextView) findViewById(R.id.restrictLat);
+        restrictMetersText = (TextView) findViewById(R.id.restrictMeters);
+        restrict = (TextView) findViewById(R.id.restrict);
+        restrict.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isRestrictMode) {
+                    titleLayout.setVisibility(View.GONE);
+                    restrictLayout.setVisibility(View.VISIBLE);
+                    isRestrictMode = true;
+                }
+
+            }
+        });
         setUpMapIfNeeded();
+        editDialog = new EditDialog();
+        editDialog.bind(this);
+        checkDialog = new CheckDialog();
+        checkDialog.bind(this);
+        progress = new Progress();
+        progress.bind(this);
     }
 
     @Override
@@ -63,7 +100,7 @@ public class TrackingActivity extends FragmentActivity {
         ParseUtil.getWatchLocation(id, new ParseUtil.OnGetLocationListener() {
             @Override
             public void onSuccess(List<WatchLocation> watchLocations) {
-                ArrayList<WatchLocation> newLocations = new ArrayList<>();
+                newLocations.clear();
                 if (watchLocations.size() > 5) {
                     for (int i = watchLocations.size() - 5; i < watchLocations.size(); i++) {
                         newLocations.add(watchLocations.get(i));
@@ -100,6 +137,20 @@ public class TrackingActivity extends FragmentActivity {
             @Override
             public void onSuccess(ParseUser parseUser) {
                 watchName.setText("Name : " + parseUser.getUsername());
+                user = parseUser;
+                ParseUtil.getRestrict(user, new ParseUtil.OnRestrictGetListener() {
+                    @Override
+                    public void onSuccess(UserRestrict userRestrict) {
+                        restrictLngText.setText("中心點經度 : "+userRestrict.getLongitude());
+                        restrictLatText.setText("中心點緯度 : "+userRestrict.getLatitude());
+                        restrictMetersText.setText("活動距離 : "+userRestrict.getMeters());
+                    }
+
+                    @Override
+                    public void onNone() {
+
+                    }
+                });
             }
 
             @Override
@@ -107,6 +158,7 @@ public class TrackingActivity extends FragmentActivity {
 
             }
         });
+
     }
 
     private void setUpMapIfNeeded() {
@@ -115,6 +167,51 @@ public class TrackingActivity extends FragmentActivity {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    if (isRestrictMode) {
+                        final double lat = latLng.latitude;
+                        final double lng = latLng.longitude;
+                        checkDialog.showDialog("確認", "選定活動中心點為 : " + String.valueOf((int) lat) +
+                                ", " + String.valueOf((int) lng), new CheckDialog.OnDialogClickListener() {
+                            @Override
+                            public void onDialogClick(Boolean result) {
+                                if (result) {
+                                    editDialog.showDialog("請設定可活動半徑",
+                                            new EditDialog.OnDialogClickListener() {
+                                                @Override
+                                                public void onDialogClick(String condition) {
+                                                    if (condition != null) {
+                                                        progress.showProgress("請稍後", "設定中...");
+                                                        ParseUtil.setRestrict(String.valueOf(lat)
+                                                                , String.valueOf(lng),
+                                                                condition, user, new ParseUtil.OnRestrictListener() {
+                                                                    @Override
+                                                                    public void onSuccess() {
+                                                                        checkDialog
+                                                                                .showAlertDialog
+                                                                                        ("成功", "限制成功", null);
+                                                                        progress.dismiss();
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onNone() {
+                                                                        checkDialog
+                                                                                .showAlertDialog
+                                                                                        ("警告", "限制失敗", null);
+                                                                        progress.dismiss();
+                                                                    }
+                                                                });
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
         }
     }
 
@@ -154,8 +251,6 @@ public class TrackingActivity extends FragmentActivity {
         polylineOpt.color(Color.BLUE);
         Polyline polyline = mMap.addPolyline(polylineOpt);
         polyline.setWidth(10);
-
-
     }
 
     private void moveMap(LatLng place) {
@@ -167,6 +262,16 @@ public class TrackingActivity extends FragmentActivity {
                         .build();
         // 使用動畫的效果移動地圖
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
 
+    @Override
+    public void onBackPressed() {
+        if (isRestrictMode) {
+            titleLayout.setVisibility(View.VISIBLE);
+            restrictLayout.setVisibility(View.GONE);
+            isRestrictMode = false;
+        } else {
+            super.onBackPressed();
+        }
     }
 }

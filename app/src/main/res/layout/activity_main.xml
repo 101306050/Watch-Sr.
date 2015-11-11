@@ -24,5 +24,5 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:visibility="gone"
-        android:text="目前還沒有追蹤任何裝置，請按下方追蹤按鈕"/>
+        android:text="目前還沒有追蹤任何裝置，請按下追蹤按鈕"/>
 </RelativeLayout>

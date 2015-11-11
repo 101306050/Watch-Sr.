@@ -27,7 +27,13 @@ public class EditDialog {
         input.setLayoutParams(lp);
         alertDialog.setView(input);
 
-        alertDialog.setPositiveButton("Comfirm",
+        alertDialog.setNegativeButton("取消",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        onDialogClickListener.onDialogClick(null);
+                    }
+                });
+        alertDialog.setPositiveButton("確定",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         onDialogClickListener.onDialogClick(input.getText().toString());
