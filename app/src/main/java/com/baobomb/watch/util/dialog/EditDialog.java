@@ -30,7 +30,6 @@ public class EditDialog {
         alertDialog.setNegativeButton("取消",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        onDialogClickListener.onDialogClick(null);
                     }
                 });
         alertDialog.setPositiveButton("確定",

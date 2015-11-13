@@ -97,6 +97,9 @@ public class TrackingActivity extends FragmentActivity {
         id = getIntent().getStringExtra("TrackId");
         watchID.setText("ID : " + id);
         setUpWatchDetail(id);
+    }
+
+    private void initMap() {
         ParseUtil.getWatchLocation(id, new ParseUtil.OnGetLocationListener() {
             @Override
             public void onSuccess(List<WatchLocation> watchLocations) {
@@ -130,9 +133,11 @@ public class TrackingActivity extends FragmentActivity {
 
             }
         });
+
     }
 
     private void setUpWatchDetail(String userID) {
+        mMap.clear();
         ParseUtil.getUser(userID, new ParseUtil.OnGetUserListener() {
             @Override
             public void onSuccess(ParseUser parseUser) {
@@ -141,9 +146,11 @@ public class TrackingActivity extends FragmentActivity {
                 ParseUtil.getRestrict(user, new ParseUtil.OnRestrictGetListener() {
                     @Override
                     public void onSuccess(UserRestrict userRestrict) {
-                        restrictLngText.setText("中心點經度 : "+userRestrict.getLongitude());
-                        restrictLatText.setText("中心點緯度 : "+userRestrict.getLatitude());
-                        restrictMetersText.setText("活動距離 : "+userRestrict.getMeters());
+                        restrictLngText.setText("中心點經度 : " + userRestrict.getLongitude());
+                        restrictLatText.setText("中心點緯度 : " + userRestrict.getLatitude());
+                        restrictMetersText.setText("活動距離 : " + userRestrict.getMeters()+"公尺");
+                        addRestrictMarker(Double.parseDouble(userRestrict.getLatitude()), Double.parseDouble(
+                                userRestrict.getLongitude()));
                     }
 
                     @Override
@@ -151,6 +158,7 @@ public class TrackingActivity extends FragmentActivity {
 
                     }
                 });
+                initMap();
             }
 
             @Override
@@ -178,7 +186,7 @@ public class TrackingActivity extends FragmentActivity {
                             @Override
                             public void onDialogClick(Boolean result) {
                                 if (result) {
-                                    editDialog.showDialog("請設定可活動半徑",
+                                    editDialog.showDialog("請設定可活動半徑(公尺w)",
                                             new EditDialog.OnDialogClickListener() {
                                                 @Override
                                                 public void onDialogClick(String condition) {
@@ -193,6 +201,7 @@ public class TrackingActivity extends FragmentActivity {
                                                                                 .showAlertDialog
                                                                                         ("成功", "限制成功", null);
                                                                         progress.dismiss();
+                                                                        setUpWatchDetail(id);
                                                                     }
 
                                                                     @Override
@@ -227,7 +236,14 @@ public class TrackingActivity extends FragmentActivity {
             moveMap(place);
         } catch (Exception e) {
         }
+    }
 
+    private void addRestrictMarker(double lat, double lng) {
+        LatLng place = new LatLng(lat, lng);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(place).title("活動中心點").snippet("中心").icon(BitmapDescriptorFactory
+                .fromResource(R.drawable.ic_flag_black_48dp));
+        mMap.addMarker(markerOptions);
     }
 
     private void addMarker(ArrayList<WatchLocation> locations) {
